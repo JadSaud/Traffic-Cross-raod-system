@@ -1,0 +1,146 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.0">
+  <POU Name="FB_Crossing" Id="{7f7f13c2-ef31-4491-9dde-30a8b67eee87}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_Crossing
+VAR_INPUT
+	bCDayMode : BOOL;
+	stMainIn : ST_TrafficLightInput;
+	stSubIn : ST_TrafficLightInput;
+END_VAR
+VAR_OUTPUT
+END_VAR
+VAR
+	fbTrafficLightArray : ARRAY[1..4] OF FB_TrafficLight; //defining the array
+	idx : INT;
+	tonCrossing : TON;
+	nStep : INT;
+	
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+CASE nStep OF
+	
+	0:  IF NOT bCDayMode THEN
+			stMainIn.bDayMode := FALSE;
+			stSubIn.bDayMode := FALSE;
+		ELSE 
+			stMainIn.bDayMode := TRUE;
+			stSubIn.bDayMode := TRUE;
+			nStep := 10;
+		END_IF
+	10: stMainIn.bSetRed := TRUE;
+		stSubIn.bSetRed := TRUE;
+		tonCrossing(IN := TRUE, PT := T#3S);
+		IF tonCrossing.Q AND bCDayMode THEN
+			stMainIn.bSetRed := FALSE;
+			stSubIn.bSetRed := FALSE;
+			tonCrossing(IN := FALSE);
+			nStep := 20;
+		END_IF
+		IF NOT bCDayMode THEN
+			tonCrossing(IN := FALSE);
+			stMainIn.bSetGreen := TRUE;
+			stMainIn.bSetRed := FALSE;
+			stSubIn.bSetGreen := TRUE;
+			stSubIn.bSetRed := FALSE;
+			nStep := 0;
+		END_IF
+	20: stSubIn.bSetRed := TRUE;
+		IF fbTrafficLightArray[3].stTrafficLightOutput.bRed THEN
+			stMainIn.bSetGreen := TRUE;
+		END_IF
+		tonCrossing(IN := TRUE, PT := T#10S);
+		IF tonCrossing.Q AND bCDayMode THEN
+			tonCrossing(IN := FALSE);
+			stMainIn.bSetGreen := FALSE;
+			stSubIn.bSetRed := FALSE;
+			nStep := 30;
+		END_IF
+		IF NOT bCDayMode THEN
+			tonCrossing(IN := FALSE);
+			stMainIn.bSetGreen := FALSE;
+			stSubIn.bSetGreen := FALSE;
+			nStep := 0;
+		END_IF
+	30: stMainIn.bSetRed := TRUE;
+		IF fbTrafficLightArray[1].stTrafficLightOutput.bRed THEN
+			stSubIn.bSetGreen := TRUE;
+		END_IF
+		tonCrossing(IN := TRUE, PT := T#10S);
+		IF tonCrossing.Q AND bCDayMode THEN
+			tonCrossing(IN := FALSE);
+			stMainIn.bSetRed := FALSE;
+			stSubIn.bSetGreen := FALSE;
+			nStep := 20;
+		END_IF
+		IF NOT bCDayMode THEN
+			tonCrossing(IN := FALSE);
+			stMainIn.bSetGreen := FALSE;
+			stSubIn.bSetGreen := FALSE;
+			nStep := 0;
+		END_IF
+			
+	
+END_CASE
+
+FOR idx := 1 TO 2 DO    
+			fbTrafficLightArray[idx](stTrafficLightInput := stMainIn);
+END_FOR
+FOR idx := 3 TO 4 DO    
+			fbTrafficLightArray[idx](stTrafficLightInput := stSubIn);
+END_FOR]]></ST>
+    </Implementation>
+    <LineIds Name="FB_Crossing">
+      <LineId Id="17" Count="0" />
+      <LineId Id="9" Count="0" />
+      <LineId Id="27" Count="0" />
+      <LineId Id="18" Count="0" />
+      <LineId Id="25" Count="1" />
+      <LineId Id="23" Count="0" />
+      <LineId Id="80" Count="1" />
+      <LineId Id="29" Count="0" />
+      <LineId Id="22" Count="0" />
+      <LineId Id="30" Count="0" />
+      <LineId Id="32" Count="0" />
+      <LineId Id="37" Count="0" />
+      <LineId Id="39" Count="0" />
+      <LineId Id="44" Count="1" />
+      <LineId Id="48" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="41" Count="0" />
+      <LineId Id="107" Count="5" />
+      <LineId Id="106" Count="0" />
+      <LineId Id="113" Count="0" />
+      <LineId Id="43" Count="0" />
+      <LineId Id="65" Count="2" />
+      <LineId Id="64" Count="0" />
+      <LineId Id="50" Count="1" />
+      <LineId Id="53" Count="0" />
+      <LineId Id="77" Count="0" />
+      <LineId Id="54" Count="0" />
+      <LineId Id="52" Count="0" />
+      <LineId Id="82" Count="0" />
+      <LineId Id="86" Count="1" />
+      <LineId Id="101" Count="0" />
+      <LineId Id="83" Count="1" />
+      <LineId Id="68" Count="7" />
+      <LineId Id="93" Count="0" />
+      <LineId Id="76" Count="0" />
+      <LineId Id="57" Count="0" />
+      <LineId Id="95" Count="1" />
+      <LineId Id="105" Count="0" />
+      <LineId Id="104" Count="0" />
+      <LineId Id="99" Count="0" />
+      <LineId Id="94" Count="0" />
+      <LineId Id="38" Count="0" />
+      <LineId Id="31" Count="0" />
+      <LineId Id="19" Count="0" />
+      <LineId Id="35" Count="1" />
+      <LineId Id="34" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="58" Count="1" />
+      <LineId Id="61" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

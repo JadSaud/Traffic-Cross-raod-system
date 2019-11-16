@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.0">
+  <POU Name="MAIN" Id="{deac02e8-b4b0-4c8f-8c97-6d4c3d73d9f1}" SpecialFunc="None">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+	
+	fbCrossing1 : FB_Crossing;
+	(*
+	bBool AT%I* : BOOL;
+	bBool2 AT%Q* : BOOL;
+	nInt1 AT%I* : INT;
+	nInt12 AT%Q* : INT;
+	nInt13 AT%Q* : INT;
+	rTrig : R_TRIG;
+	
+*)
+	
+	
+
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+
+fbCrossing1();
+(*
+rTrig(CLK := bBool);
+IF rTrig.Q THEN
+	bBool2 := NOT bBool2;
+END_IF
+*)]]></ST>
+    </Implementation>
+    <LineIds Name="MAIN">
+      <LineId Id="7" Count="0" />
+      <LineId Id="46" Count="0" />
+      <LineId Id="45" Count="0" />
+      <LineId Id="61" Count="0" />
+      <LineId Id="60" Count="0" />
+      <LineId Id="78" Count="2" />
+      <LineId Id="98" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>

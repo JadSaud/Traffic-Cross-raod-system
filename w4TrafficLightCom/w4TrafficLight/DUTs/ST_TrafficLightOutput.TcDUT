@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.0">
+  <DUT Name="ST_TrafficLightOutput" Id="{6846b70c-dd8e-497b-9ab1-839c74b6da18}">
+    <Declaration><![CDATA[TYPE ST_TrafficLightOutput :
+STRUCT
+	bRed : BOOL;
+	bYellow : BOOL;
+	bGreen : BOOL;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

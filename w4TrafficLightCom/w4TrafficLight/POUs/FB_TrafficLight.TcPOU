@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.4024.0">
+  <POU Name="FB_TrafficLight" Id="{1b26eb70-8242-49df-886d-4756d17910e6}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_TrafficLight
+VAR_INPUT
+	//bDayMode : BOOL;
+	//bSetRed : BOOL;
+	//bSetGreen : BOOL;
+	stTrafficLightInput : ST_TrafficLightInput;
+END_VAR
+VAR_OUTPUT
+	//bRed : BOOL;
+	//bYellow : BOOL;
+	//bGreen : BOOL;
+	stTrafficLightOutput : ST_TrafficLightOutput;
+END_VAR
+VAR
+	nStep : INT := 0;
+	fbBlinker : FB_Blinker;
+	//tonRedTimer : TON;
+	tonYellowTimer : TON;
+	//tonGreenTimer : TON;
+	rTrigSetGreen : R_TRIG;
+	rTrigSetRed : R_TRIG;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[CASE nStep OF
+	0: 	IF NOT stTrafficLightInput.bDayMode THEN
+			fbBlinker(bEnable := TRUE, bBlink => stTrafficLightOutput.bYellow);
+		ELSE
+			fbBlinker(bEnable := FALSE);
+			stTrafficLightOutput.bYellow := FALSE;
+			nStep := 10;
+		END_IF
+	10: stTrafficLightOutput.bRed := TRUE;
+		stTrafficLightOutput.bYellow := FALSE;
+		stTrafficLightOutput.bGreen := FALSE;
+		//tonRedTimer(IN:= TRUE, PT := T#10S);
+		IF NOT stTrafficLightInput.bDayMode THEN
+			stTrafficLightOutput.bRed := FALSE;
+			stTrafficLightOutput.bGreen := FALSE;
+			nStep := 0;
+		END_IF
+		rTrigSetGreen(CLK := stTrafficLightInput.bSetGreen);
+		IF rTrigSetGreen.Q THEN
+			//tonRedTimer(IN := FALSE);//reset my timer
+			nStep := 20;
+		END_IF
+	20: stTrafficLightOutput.bRed := TRUE;
+		stTrafficLightOutput.bYellow := TRUE;
+		stTrafficLightOutput.bGreen := FALSE;
+		tonYellowTimer(in:= TRUE, PT := T#3S);		
+		IF tonYellowTimer.Q THEN
+			tonYellowTimer(IN := FALSE);
+			nStep := 30;
+		END_IF
+		IF NOT stTrafficLightInput.bDayMode THEN
+			tonYellowTimer(IN := FALSE);
+			stTrafficLightOutput.bRed := FALSE;
+			stTrafficLightOutput.bGreen := FALSE;
+			nStep := 0;
+		END_IF
+	30: stTrafficLightOutput.bRed := FALSE;
+		stTrafficLightOutput.bYellow := FALSE;
+		stTrafficLightOutput.bGreen := TRUE;
+		//tonGreenTimer(IN := TRUE, PT := T#10S);
+		rTrigSetRed(CLK := stTrafficLightInput.bSetRed);
+		IF rTrigSetRed.Q THEN
+			//tonGreenTimer(IN := FALSE);
+			nStep := 40;
+		END_IF
+		IF NOT stTrafficLightInput.bDayMode THEN
+			stTrafficLightOutput.bRed := FALSE;
+			stTrafficLightOutput.bGreen := FALSE;
+			nStep := 0;
+		END_IF
+	40: stTrafficLightOutput.bRed := FALSE;
+		stTrafficLightOutput.bYellow := TRUE;
+		stTrafficLightOutput.bGreen := FALSE;
+		tonYellowTimer(in:= TRUE, PT := T#3S);
+		IF tonYellowTimer.Q THEN
+			tonYellowTimer(IN := FALSE);
+			nStep := 10;
+		END_IF
+		IF NOT stTrafficLightInput.bDayMode THEN
+			tonYellowTimer(IN := FALSE);
+			nStep := 0;
+		END_IF
+END_CASE]]></ST>
+    </Implementation>
+    <LineIds Name="FB_TrafficLight">
+      <LineId Id="121" Count="61" />
+      <LineId Id="2" Count="0" />
+    </LineIds>
+  </POU>
+</TcPlcObject>
